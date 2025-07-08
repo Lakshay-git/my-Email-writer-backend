@@ -3,14 +3,11 @@ package com.app;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
-
-@RestController
 
 @Service
 public class EmailGeneratorService {
@@ -19,23 +16,17 @@ public class EmailGeneratorService {
     private String apiKey;
 
     @Value("${gemini.api.url}")
-    private String apiUrl; // 🔥 Add this line to read URL from application.properties
-
-
+    private String apiUrl;
 
     private final WebClient webClient = WebClient.builder()
-            .baseUrl("https://generativelanguage.googleapis.com/v1beta") // Gemini API base
+            .baseUrl("https://generativelanguage.googleapis.com/v1beta")
             .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
             .build();
 
     public String generateEmailReply(EmailRequest emailRequest) {
         String userPrompt = buildPrompt(emailRequest);
+        String url = apiUrl + "?key=" + apiKey;
 
-        // ✅ Gemini 1.5 Pro model endpoint
-//        String url = "/models/gemini-1.5-pro:generateContent?key=" + apiKey;
-        String url = apiUrl + "?key=" + apiKey; // 🔁 Use this instead of hardcoding the URL
-
-        // ✅ Request body as per Gemini API structure
         Map<String, Object> requestBody = Map.of(
                 "contents", new Object[]{
                         Map.of("parts", new Object[]{
@@ -45,7 +36,6 @@ public class EmailGeneratorService {
         );
 
         try {
-            // 🔁 API call
             String response = webClient.post()
                     .uri(url)
                     .bodyValue(requestBody)
@@ -60,7 +50,6 @@ public class EmailGeneratorService {
         }
     }
 
-    // ✅ Extract response from JSON
     private String extractResponseContent(String response) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -77,7 +66,6 @@ public class EmailGeneratorService {
         }
     }
 
-    // ✅ Create prompt from request
     private String buildPrompt(EmailRequest emailRequest) {
         StringBuilder prompt = new StringBuilder();
         prompt.append("Generate a professional email reply for the following email content. Do not include a subject line. ");
