@@ -12,7 +12,7 @@ public class EmailGeneratorController {
 
     private final EmailGeneratorService emailGeneratorService;
 
-    // ✅ POST API — used by frontend body JSON
+    // ✅ POST API — used by frontend with JSON body
     @PostMapping("/generate")
     public ResponseEntity<String> generateEmail(@RequestBody EmailRequest emailRequest) {
         String response = emailGeneratorService.generateEmailReply(emailRequest);
@@ -28,5 +28,11 @@ public class EmailGeneratorController {
         EmailRequest emailRequest = new EmailRequest(emailContent, tone);
         String response = emailGeneratorService.generateEmailReply(emailRequest);
         return ResponseEntity.ok(response);
+    }
+
+    // ✅ Simple GET test endpoint
+    @GetMapping("/test")
+    public ResponseEntity<String> testAPI() {
+        return ResponseEntity.ok("✅ Email Writer API is working!");
     }
 }
